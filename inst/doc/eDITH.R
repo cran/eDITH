@@ -5,6 +5,9 @@ knitr::opts_chunk$set(
 )
 
 ## ---- eval=FALSE--------------------------------------------------------------
+#  install.packages("eDITH")
+
+## ---- eval=FALSE--------------------------------------------------------------
 #  devtools::install_github("lucarraro/eDITH")
 
 ## ----overview, echo=FALSE, fig.cap="Flowchart for the choice of covariates used to fit the eDITH model.", out.width = '90%'----
