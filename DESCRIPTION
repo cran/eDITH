@@ -1,7 +1,7 @@
 Package: eDITH
 Type: Package
 Title: Model Transport of Environmental DNA in River Networks
-Version: 0.1.2
+Version: 0.2.0
 Authors@R: 
     c(person("Luca", "Carraro", 
 	email = "luca.carraro@hotmail.it", role = c("cre", "aut")),
@@ -22,15 +22,17 @@ Encoding: UTF-8
 Depends: R (>= 3.6)
 Suggests: knitr, rmarkdown, bookdown
 VignetteBuilder: knitr
-URL: https://lucarraro.github.io/eDITH/
+URL: https://lucarraro.github.io/eDITH/,
+        https://github.com/lucarraro/eDITH
+BugReports: https://github.com/lucarraro/eDITH/issues
 Imports: Rcpp (>= 1.0.10), OCNet (>= 1.1.0), rivnet (>= 0.3.1),
         BayesianTools, LaplacesDemon, DHARMa, terra, fields
 LinkingTo: Rcpp
 NeedsCompilation: yes
-Packaged: 2023-10-24 12:29:33 UTC; lucac
+Packaged: 2024-01-16 11:50:50 UTC; lucac
 Author: Luca Carraro [cre, aut],
   Florian Altermatt [aut],
   University of Zurich [cph, fnd]
 Maintainer: Luca Carraro <luca.carraro@hotmail.it>
 Repository: CRAN
-Date/Publication: 2023-10-24 13:30:02 UTC
+Date/Publication: 2024-01-16 12:40:03 UTC

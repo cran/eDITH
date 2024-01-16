@@ -3,7 +3,14 @@ run_eDITH_optim <-
            use.AEM = FALSE, n.AEM = NULL, par.AEM = NULL,
            no.det = FALSE, ll.type = "norm", source.area = "AG",
            likelihood = NULL, sampler = NULL, n.attempts = 100,
-           par.optim = NULL, verbose = FALSE){
+           par.optim = NULL,
+           tau.prior = list(spec="lnorm",a=0,b=Inf, meanlog=log(5), sd=sqrt(log(5)-log(4))),
+           log_p0.prior = list(spec="unif",min=-20, max=0),
+           beta.prior = list(spec="norm",sd=1),
+           sigma.prior = list(spec="unif",min=0, max=1*max(data$values, na.rm = TRUE)),
+           omega.prior = list(spec="unif",min=1, max=10*max(data$values, na.rm = TRUE)),
+           Cstar.prior = list(spec="unif",min=0, max=1*max(data$values, na.rm = TRUE)),
+           verbose = FALSE){
 
     if (is.null(par.optim$control)) par.optim$control <- list(fnscale = -1, maxit = 1e6)
     if (is.null(par.optim$control$fnscale)) par.optim$control$fnscale <- -1
@@ -11,6 +18,13 @@ run_eDITH_optim <-
     if (!no.det & ll.type =="lnorm" & any(data$values==0)){
       stop('If eDNA data are log-normally distributed, non-detections must be accounted for.')
     }
+
+    if (length(river$AG$A)==0) {
+      stop('river is not aggregated. You should run rivnet::aggregate_river on river prior to run_eDITH_optim.')}
+
+    if (length(river$AG$discharge)==0) {
+      stop('Missing hydrological data. You should run rivnet::hydro_river on river prior to run_eDITH_optim.')}
+
 
     if (!is.null(likelihood)){ll.type="custom"} # doesn't this give errors?
 
@@ -55,23 +69,15 @@ run_eDITH_optim <-
       }
     }
 
-    # default values
-    tau.prior = list(spec="lnorm",a=0,b=Inf, meanlog=log(5), sd=sqrt(log(5)-log(4)))
-    log_p0.prior = list(spec="unif",min=-20, max=0)
-    beta.prior = list(spec="norm",sd=1)
-    sigma.prior = list(spec="unif",min=0, max=1*max(data$values, na.rm = TRUE))
-    omega.prior = list(spec="unif",min=1, max=10*max(data$values, na.rm = TRUE))
-    Cstar.prior = list(spec="unif",min=0, max=1*max(data$values, na.rm = TRUE))
-
     out <- prepare.prior(covariates, no.det, ll.type, tau.prior, log_p0.prior,
                          beta.prior, sigma.prior, omega.prior, Cstar.prior, river$AG$nNodes)
     names.par <- out$names.par; allPriors <- out$allPriors
-    # lb <- ub  <- numeric(0)
-    # for (nam in names.par){
-    #   lb <- c(lb, allPriors[[nam]]$a)
-    #   ub <- c(ub, allPriors[[nam]]$b)
-    #}
-    #names(lb) <- names(ub)  <- names.par
+    lb <- ub  <- numeric(0)
+     for (nam in names.par){
+       lb <- c(lb, allPriors[[nam]]$a)
+       ub <- c(ub, allPriors[[nam]]$b)
+    }
+    names(lb) <- names(ub)  <- names.par
 
     if(is.null(likelihood)){ # likelihood_generic is taken from run_eDITH_BT
       likelihood <- function(param){likelihood_generic(param, river,
@@ -79,10 +85,16 @@ run_eDITH_optim <-
                                                        covariates,
                                                        data, no.det,
                                                        ll.type)}}
-    par.optim$fn <- likelihood
 
     if (is.null(sampler)){
       sampler <- function(n=1){sampler_generic(n,  allPriors = allPriors)}}
+
+    density <- function(x){
+      if (any(x<lb) | any(x>ub) ){ -Inf
+        } else {
+      density_generic(x, allPriors = allPriors)}}
+    logpost <- function(param) {likelihood(param) + density(param) }
+    par.optim$fn <- logpost
 
     ll_end_vec <- counts <- conv <- tau_vec <-  numeric(n.attempts)
     for (ind in 1:n.attempts){
@@ -91,7 +103,7 @@ run_eDITH_optim <-
       tau_vec[ind] <- out$par["tau"]
       counts[ind] <- out$counts["function"]
       conv[ind] <- out$convergence
-      if (out$par["tau"]<0) out$value = -Inf # discard solutions with negative tau (unnecessary with logit transf)
+      # if (out$par["tau"]<0) out$value = -Inf # discard solutions with negative tau (unnecessary with logit transf)
       ll_end_vec[ind] <- out$value
       if (ind > 1){
         if (ll_end_vec[ind] > max(ll_end_vec[1:(ind-1)])) out_optim <- out
