@@ -1,7 +1,7 @@
 Package: eDITH
 Type: Package
 Title: Model Transport of Environmental DNA in River Networks
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: 
     c(person("Luca", "Carraro", 
 	email = "luca.carraro@hotmail.it", role = c("cre", "aut")),
@@ -14,8 +14,9 @@ Description: Runs the eDITH (environmental DNA Integrating Transport
   (e.g., obtained via quantitative polymerase chain reaction) or metabarcoding 
   (read count) data. Parameter estimation can be performed via Bayesian techniques 
   (via the 'BayesianTools' package) or optimization algorithms. An interface to the 
-  'DHARMa' package for posterior predictive checks is provided. See Carraro et al. 
-  (2018) <doi:10.1073/pnas.1813843115> and Carraro et al. (2020) 
+  'DHARMa' package for posterior predictive checks is provided. See Carraro and 
+  Altermatt (2024) <doi:10.1111/2041-210X.14317> for a package introduction; 
+  Carraro et al. (2018) <doi:10.1073/pnas.1813843115> and Carraro et al. (2020) 
   <doi:10.1038/s41467-020-17337-8> for methodological details. 
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -29,10 +30,10 @@ Imports: Rcpp (>= 1.0.10), OCNet (>= 1.1.0), rivnet (>= 0.3.1),
         BayesianTools, LaplacesDemon, DHARMa, terra, fields
 LinkingTo: Rcpp
 NeedsCompilation: yes
-Packaged: 2024-01-16 11:50:50 UTC; lucac
+Packaged: 2024-03-28 11:46:13 UTC; lucac
 Author: Luca Carraro [cre, aut],
   Florian Altermatt [aut],
   University of Zurich [cph, fnd]
 Maintainer: Luca Carraro <luca.carraro@hotmail.it>
 Repository: CRAN
-Date/Publication: 2024-01-16 12:40:03 UTC
+Date/Publication: 2024-03-28 15:50:06 UTC

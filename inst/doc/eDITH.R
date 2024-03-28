@@ -4,17 +4,17 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  install.packages("eDITH")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  devtools::install_github("lucarraro/eDITH")
 
 ## ----overview, echo=FALSE, fig.cap="Flowchart for the choice of covariates used to fit the eDITH model.", out.width = '90%'----
 knitr::include_graphics("flowchart_cov.png")
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  # Extract river from DEM
 #  river <- rivnet::extract_river(outlet=c(637478,237413),
 #                      EPSG=21781, #CH1903/LV03 coordinate system
@@ -38,17 +38,17 @@ knitr::include_graphics("flowchart_cov.png")
 #  river <- rivnet::covariate_river(r1, river)
 #  
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  data(dataC)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  dataC[which(dataC$ID==2),]
 #  #>    ID       values
 #  #> 1   2 0.000000e+00
 #  #> 25  2 1.037331e-12
 #  #> 49  2 8.176798e-13
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  sites <- unique(dataC$ID)
 #  values <- numeric(length(sites))
 #  for (ind in 1:length(sites)){
@@ -66,7 +66,7 @@ knitr::include_graphics("flowchart_cov.png")
 knitr::include_graphics("map2.png")
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  covariates <- data.frame(urban = river$SC$locCov$landcover_1,
 #                           agriculture = river$SC$locCov$landcover_2,
 #                           forest = river$SC$locCov$landcover_3,
@@ -74,22 +74,22 @@ knitr::include_graphics("map2.png")
 #                           log_drainageArea = log(river$AG$A))
 #  
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  set.seed(1)
 #  out.bt.cov <- run_eDITH_BT(dataC, river, covariates)
 #  
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  set.seed(1)
 #  out.bt.aem <- run_eDITH_BT(dataC, river)
 #  
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  set.seed(27)
 #  out.opt.aem <- run_eDITH_optim(dataC, river, n.AEM = 10,
 #  	n.attempts = 1)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  plot(out.opt.aem$C[dataC$ID], dataC$values,
 #       xlim=c(0,8e-12), ylim=c(0, 8e-12), asp=1,
 #       xlab = "Modelled concentration [mol m-3]",
@@ -100,7 +100,7 @@ knitr::include_graphics("map2.png")
 knitr::include_graphics("Cobs.png")
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  plot(river, out.opt.aem$C, colLevels=c(0, max(values), 1000), addLegend = FALSE,
 #       colPalette = hcl.colors(1000, "Reds 3", rev=T))
 #  rivnet::points_colorscale(river$AG$X[unique(dataC$ID)], river$AG$Y[unique(dataC$ID)],
@@ -111,7 +111,7 @@ knitr::include_graphics("Cobs.png")
 knitr::include_graphics("mapC.png")
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  plot(river, out.opt.aem$p)
 #  title('DNA production rate [mol m-2 s-1]')
 
@@ -119,7 +119,7 @@ knitr::include_graphics("mapC.png")
 knitr::include_graphics("mapp.png")
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  plot(river, out.opt.aem$probDet)
 #  title('Detection probability')
 

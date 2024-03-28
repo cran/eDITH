@@ -3,7 +3,7 @@ run_eDITH_optim <-
            use.AEM = FALSE, n.AEM = NULL, par.AEM = NULL,
            no.det = FALSE, ll.type = "norm", source.area = "AG",
            likelihood = NULL, sampler = NULL, n.attempts = 100,
-           par.optim = NULL,
+           n.restarts = round(n.attempts/10), par.optim = NULL,
            tau.prior = list(spec="lnorm",a=0,b=Inf, meanlog=log(5), sd=sqrt(log(5)-log(4))),
            log_p0.prior = list(spec="unif",min=-20, max=0),
            beta.prior = list(spec="norm",sd=1),
@@ -73,9 +73,9 @@ run_eDITH_optim <-
                          beta.prior, sigma.prior, omega.prior, Cstar.prior, river$AG$nNodes)
     names.par <- out$names.par; allPriors <- out$allPriors
     lb <- ub  <- numeric(0)
-     for (nam in names.par){
-       lb <- c(lb, allPriors[[nam]]$a)
-       ub <- c(ub, allPriors[[nam]]$b)
+    for (nam in names.par){
+      lb <- c(lb, allPriors[[nam]]$a)
+      ub <- c(ub, allPriors[[nam]]$b)
     }
     names(lb) <- names(ub)  <- names.par
 
@@ -91,19 +91,20 @@ run_eDITH_optim <-
 
     density <- function(x){
       if (any(x<lb) | any(x>ub) ){ -Inf
-        } else {
-      density_generic(x, allPriors = allPriors)}}
+      } else {
+        density_generic(x, allPriors = allPriors)}}
     logpost <- function(param) {likelihood(param) + density(param) }
     par.optim$fn <- logpost
 
     ll_end_vec <- counts <- conv <- tau_vec <-  numeric(n.attempts)
     for (ind in 1:n.attempts){
-      par.optim$par <- sampler(1)
+      if (ind %in% seq(1,n.attempts,ceiling(n.attempts/n.restarts))){ # start n.restarts different times
+        par.optim$par <- sampler(1)
+      } else {par.optim$par <- out$par}
       out <- suppressWarnings(do.call(optim, par.optim))
       tau_vec[ind] <- out$par["tau"]
       counts[ind] <- out$counts["function"]
       conv[ind] <- out$convergence
-      # if (out$par["tau"]<0) out$value = -Inf # discard solutions with negative tau (unnecessary with logit transf)
       ll_end_vec[ind] <- out$value
       if (ind > 1){
         if (ll_end_vec[ind] > max(ll_end_vec[1:(ind-1)])) out_optim <- out
@@ -112,6 +113,7 @@ run_eDITH_optim <-
     }
     if (verbose) message("100% done    \n", appendLF = FALSE)
 
+    attempts.stats <- list(lp=ll_end_vec, counts=counts, conv=conv, tau=tau_vec)
 
     tmp <- eval.pC.pD(out_optim$par, river, ss, covariates, source.area,
                       q, ll.type, no.det)
@@ -122,7 +124,7 @@ run_eDITH_optim <-
                 param = param,
                 ll.type=ll.type, no.det=no.det, data=data,
                 covariates = covariates, source.area = source.area,
-                out_optim = out_optim)
+                out_optim = out_optim, attempts.stats = attempts.stats)
 
     invisible(out)
 
